@@ -1,12 +1,4 @@
-
-import {
-  Component,
-  OnInit,
-  ElementRef,
-  ViewChild,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, inject, signal, computed } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FileService } from '../../services/file';
@@ -16,11 +8,19 @@ import { FileService } from '../../services/file';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-
   private fileService = inject(FileService);
+
+  // Theme preference
+  isDarkMode = signal(localStorage.getItem('fileharbor-theme') !== 'light');
+
+  toggleTheme(): void {
+    this.isDarkMode.update((dark) => !dark);
+
+    localStorage.setItem('fileharbor-theme', this.isDarkMode() ? 'dark' : 'light');
+  }
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -36,6 +36,70 @@ export class Dashboard implements OnInit {
   success = signal('');
 
   deletingFile = signal<string | null>(null);
+  // Search, filter and sorting
+  searchQuery = signal('');
+
+  selectedType = signal('all');
+
+  sortOrder = signal('az');
+
+  filteredFiles = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const type = this.selectedType();
+    const order = this.sortOrder();
+
+    return this.files()
+      .filter((filename) => {
+        const name = filename.toLowerCase();
+        const extension = name.split('.').pop() ?? '';
+
+        const matchesSearch = name.includes(query);
+
+        const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
+        const documentTypes = ['doc', 'docx', 'txt', 'rtf', 'odt'];
+        const spreadsheetTypes = ['xls', 'xlsx', 'csv', 'ods'];
+        const videoTypes = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+        const audioTypes = ['mp3', 'wav', 'ogg', 'm4a', 'flac'];
+
+        let matchesType = true;
+
+        switch (type) {
+          case 'images':
+            matchesType = imageTypes.includes(extension);
+            break;
+          case 'pdf':
+            matchesType = extension === 'pdf';
+            break;
+          case 'documents':
+            matchesType = documentTypes.includes(extension);
+            break;
+          case 'spreadsheets':
+            matchesType = spreadsheetTypes.includes(extension);
+            break;
+          case 'videos':
+            matchesType = videoTypes.includes(extension);
+            break;
+          case 'audio':
+            matchesType = audioTypes.includes(extension);
+            break;
+          case 'other':
+            matchesType = ![
+              ...imageTypes,
+              'pdf',
+              ...documentTypes,
+              ...spreadsheetTypes,
+              ...videoTypes,
+              ...audioTypes,
+            ].includes(extension);
+            break;
+        }
+
+        return matchesSearch && matchesType;
+      })
+      .sort((a, b) => {
+        return order === 'az' ? a.localeCompare(b) : b.localeCompare(a);
+      });
+  });
 
   ngOnInit(): void {
     this.loadFiles();
@@ -56,7 +120,7 @@ export class Dashboard implements OnInit {
 
         this.error.set('Unable to load files. Please try again.');
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -97,7 +161,7 @@ export class Dashboard implements OnInit {
 
         this.error.set('Upload failed. Please try again.');
         this.uploading.set(false);
-      }
+      },
     });
   }
 
@@ -125,7 +189,7 @@ export class Dashboard implements OnInit {
       error: (err) => {
         console.error('Download error:', err);
         this.error.set('Download failed. Please try again.');
-      }
+      },
     });
   }
 
@@ -169,7 +233,7 @@ export class Dashboard implements OnInit {
         this.error.set('Delete failed. Please try again.');
         this.deleting.set(false);
         this.deletingFile.set(null);
-      }
+      },
     });
   }
 }
