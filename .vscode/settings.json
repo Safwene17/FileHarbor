@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/68c87b38-e13f-40e6-84f9-e66ccd838490/resourceGroups/University_Projects/providers/Microsoft.Web/sites/FileHarborClient",
+    "appService.deploySubpath": "frontend"
+}

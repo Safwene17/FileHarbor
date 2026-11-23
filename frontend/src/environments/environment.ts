@@ -1,3 +1,4 @@
 export const environment = {
-  apiUrl: 'YOUR_PRODUCTION_BACKEND_URL/api/files'
+  production: true,
+  apiUrl: 'https://fileharborapi-ahbhe6f4bqefbjhx.belgiumcentral-01.azurewebsites.net/api/files'
 };
