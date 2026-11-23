@@ -11,7 +11,7 @@ The application is built with Angular and Spring Boot and deployed using Microso
 | Component | Link |
 |---|---|
 | **Frontend** | [FileHarbor Web Application](https://fileharborclient-hubgaagvfgcxgweq.belgiumcentral-01.azurewebsites.net) |
-| **Backend API** | [FileHarbor REST API](https://fileharborapi-ahbhe6f4bqefbjhx.belgiumcentral-01.azurewebsites.net) |
+| **Backend API** | [FileHarbor REST API](https://fileharborapi-ahbhe6f4bqefbjhx.belgiumcentral-01.azurewebsites.net/api/files) |
 
 ## ✨ Features
 
